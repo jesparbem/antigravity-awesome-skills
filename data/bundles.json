@@ -14,6 +14,7 @@
         "api-documentation",
         "api-documentation-generator",
         "api-documenter",
+        "api-endpoint-builder",
         "api-fuzzing-bug-bounty",
         "api-patterns",
         "api-security-best-practices",
@@ -259,6 +260,7 @@
       "skills": [
         "accessibility-compliance-accessibility-audit",
         "antigravity-workflows",
+        "api-endpoint-builder",
         "api-fuzzing-bug-bounty",
         "api-security-best-practices",
         "api-security-testing",
