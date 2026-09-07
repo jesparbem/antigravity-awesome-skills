@@ -1,0 +1,144 @@
+# BTC 5m Up/Down profiles — the single source of truth for strategy parameters.
+#
+# Every key below is read and validated at startup by btc5m.config.load_profiles.
+# `shared_rules` supplies defaults; a profile may override any subsection and the
+# two are deep-merged. An unknown value or an out-of-range number aborts the run
+# with the exact YAML path, rather than silently reverting to a default.
+version: 2
+name: btc_5m_impulse_momentum_profiles
+market: polymarket_btc_updown_5m
+
+strategy_reference:
+  style: momentum_follow_through_into_close
+  entry_window_seconds_left_target: 120
+  entry_window_seconds_left_tolerance: 30
+  skew_bias_note: "Prefer the direction supported by market skew once momentum is established."
+  optional_hedge_note: "When skew is extreme (>=95/5), a small opposite hedge caps last-second reversal risk."
+
+shared_rules:
+  market_validation:
+    require_active: true
+    require_not_closed: true
+    require_end_in_future_sec_min: 5
+
+  # Entry window. `max_entry_seconds_left` implements the documented
+  # "~120s left, 30s tolerance" upper bound (target + tolerance = 150).
+  session_timing:
+    min_entry_seconds_left: 90
+    max_entry_seconds_left: 150
+    exit_before_sec: 20
+
+  # Microstructure guards, evaluated on every tick before an order is sized.
+  execution_safety:
+    skip_if_quote_stale_sec_gt: 8
+    skip_if_dns_or_api_errors_consecutive: 3
+    skip_if_spread_gt: 0.03
+    skip_if_top_ask_notional_usd_lt: 30
+    require_liquidity_data: true
+
+  # BTC spot impulse confirmation (~$70-$100 move inside the active slot).
+  impulse_filter:
+    enabled: true
+    source: binance          # binance | coinbase | simulated
+    symbol: BTCUSDT
+    btc_move_usd_min: 70
+    btc_move_usd_max_reference: 100
+    require_direction_match: true   # never fade an established move
+    min_samples: 3
+    fail_action: skip        # skip | ignore — what to do when the feed is down
+
+  runner:
+    poll_sec: 5
+    entry_timeout_min: 60
+    close_retry_max: 30
+    close_retry_delay_sec: 2
+
+profiles:
+  conservative:
+    description: "Stricter filters, lower per-trade risk. Default profile."
+    signal:
+      trigger_source: clob_best_ask
+      threshold_price: 0.70
+    sizing:
+      stake_usd: 5
+      risk_per_trade_pct_equity: 8
+      max_notional_usd: 8
+      daily_max_loss_pct: 10
+      max_trades_per_day: 12
+    hedge:
+      enabled: true
+      trigger_side_price_gte: 0.95
+      trigger_seconds_left_lte: 120
+      hedge_share_of_main_pct: 3
+      hedge_notional_usd_min: 1
+      hedge_notional_usd_max: 2
+    stop_loss:
+      enabled: true
+      stop_loss_pct_from_entry: 0.25
+
+  aggressive:
+    description: "Higher frequency and higher risk. Wider entry window, looser guards."
+    session_timing:
+      min_entry_seconds_left: 75
+      max_entry_seconds_left: 180
+    execution_safety:
+      skip_if_spread_gt: 0.05
+      skip_if_top_ask_notional_usd_lt: 20
+    impulse_filter:
+      btc_move_usd_min: 50
+    runner:
+      poll_sec: 3
+    signal:
+      trigger_source: clob_best_ask
+      threshold_price: 0.70
+    sizing:
+      stake_usd: 5
+      risk_per_trade_pct_equity: 15
+      max_notional_usd: 15
+      daily_max_loss_pct: 15
+      max_trades_per_day: 20
+    hedge:
+      enabled: true
+      trigger_side_price_gte: 0.93
+      trigger_seconds_left_lte: 130
+      hedge_share_of_main_pct: 5
+      hedge_notional_usd_min: 1
+      hedge_notional_usd_max: 3
+    stop_loss:
+      enabled: true
+      stop_loss_pct_from_entry: 0.30
+
+  # Zero-risk profile: identical plumbing, paper execution enforced by the CLI.
+  demo:
+    description: "Paper-trading profile for demos and dry runs. Never places real orders."
+    session_timing:
+      min_entry_seconds_left: 60
+      max_entry_seconds_left: 240
+    execution_safety:
+      skip_if_spread_gt: 0.10
+      skip_if_top_ask_notional_usd_lt: 0
+      require_liquidity_data: false
+    impulse_filter:
+      btc_move_usd_min: 30
+      require_direction_match: false
+      fail_action: ignore
+    signal:
+      threshold_price: 0.62
+    sizing:
+      stake_usd: 5
+      risk_per_trade_pct_equity: 10
+      max_notional_usd: 10
+      daily_max_loss_pct: 100
+      max_trades_per_day: 50
+    hedge:
+      enabled: true
+      trigger_side_price_gte: 0.92
+      trigger_seconds_left_lte: 150
+      hedge_share_of_main_pct: 4
+      hedge_notional_usd_min: 1
+      hedge_notional_usd_max: 2
+    stop_loss:
+      enabled: true
+      stop_loss_pct_from_entry: 0.30
+    runner:
+      poll_sec: 2

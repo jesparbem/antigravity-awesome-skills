@@ -1,0 +1,13 @@
+# Runtime dependencies. Lower bounds are the versions this build was verified
+# against; no upper pins so security patches can be picked up.
+httpx>=0.27
+PyYAML>=6.0
+rich>=13.7
+
+# Web front-end
+fastapi>=0.115
+uvicorn[standard]>=0.30
+Jinja2>=3.1
+python-multipart>=0.0.9
+itsdangerous>=2.2
+argon2-cffi>=23.1

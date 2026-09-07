@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Sign in — btc5m{% endblock %}
+{% block body %}
+<main class="auth">
+  <form class="card auth-card" method="post" action="/login" autocomplete="off">
+    <div class="brand">
+      <span class="brand-mark">₿</span>
+      <div>
+        <h1>btc5m</h1>
+        <p class="muted">BTC 5m Up/Down — operator console</p>
+      </div>
+    </div>
+
+    {% if error %}<p class="alert" role="alert">{{ error }}</p>{% endif %}
+
+    <label for="username">User</label>
+    <input id="username" name="username" type="text" required autocomplete="username" autofocus>
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required autocomplete="current-password">
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button type="submit" class="primary">Sign in</button>
+
+    <p class="muted small">
+      {% if read_only %}This deployment is <strong>read-only</strong>: the console can watch a
+      session but cannot start, stop or trade.{% else %}Controls are <strong>enabled</strong> on
+      this deployment.{% endif %}
+    </p>
+  </form>
+</main>
+{% endblock %}

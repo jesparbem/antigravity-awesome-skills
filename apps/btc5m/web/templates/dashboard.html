@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — btc5m{% endblock %}
+{% block body %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+<meta name="read-only" content="{{ 'true' if read_only else 'false' }}">
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">₿</span>
+    <div>
+      <h1>btc5m</h1>
+      <p class="muted small" id="subtitle">connecting…</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="pill" id="mode-pill">—</span>
+    <span class="pill" id="run-pill">—</span>
+    {% if read_only %}<span class="pill warn" title="Controls disabled by BTC5M_WEB_READONLY">read-only</span>{% endif %}
+    <span class="muted small">{{ username }}</span>
+    <form method="post" action="/logout" class="inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="ghost">Sign out</button>
+    </form>
+  </div>
+</header>
+
+<main class="grid">
+  <section class="card" id="card-market">
+    <h2>Market</h2>
+    <dl class="kv">
+      <dt>Slot</dt><dd id="m-slug">—</dd>
+      <dt>Closes</dt><dd id="m-end">—</dd>
+      <dt>Time left</dt><dd><span id="m-left">—</span><div class="bar"><i id="m-bar"></i></div></dd>
+      <dt>BTC spot</dt><dd id="m-spot">—</dd>
+      <dt>In-slot move</dt><dd id="m-move">—</dd>
+    </dl>
+  </section>
+
+  <section class="card" id="card-book">
+    <h2>Order book</h2>
+    <table class="book">
+      <thead><tr><th>Side</th><th>Bid</th><th>Ask</th><th>Spread</th><th>Ask depth</th></tr></thead>
+      <tbody id="book-body">
+        <tr><td colspan="5" class="muted">—</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card" id="card-decision">
+    <h2>Decision</h2>
+    <p class="decision-line"><span class="dot" id="d-dot"></span><span id="d-action">—</span></p>
+    <p class="muted" id="d-reason">waiting for the first tick…</p>
+    <dl class="kv" id="d-detail"></dl>
+  </section>
+
+  <section class="card" id="card-position">
+    <h2>Position</h2>
+    <div id="p-empty" class="muted">Flat.</div>
+    <dl class="kv" id="p-detail" hidden>
+      <dt>Side</dt><dd id="p-side">—</dd>
+      <dt>Unrealised</dt><dd id="p-unreal">—</dd>
+      <dt>Entry → mark</dt><dd id="p-prices">—</dd>
+      <dt>Stop</dt><dd id="p-stop">—</dd>
+      <dt>Size</dt><dd id="p-size">—</dd>
+    </dl>
+  </section>
+
+  <section class="card" id="card-risk">
+    <h2>Risk</h2>
+    <dl class="kv">
+      <dt>Equity</dt><dd id="r-equity">—</dd>
+      <dt>Realised</dt><dd id="r-pnl">—</dd>
+      <dt>Trades today</dt><dd><span id="r-trades">—</span><div class="bar"><i id="r-trades-bar"></i></div></dd>
+      <dt>Daily loss</dt><dd><span id="r-loss">—</span><div class="bar"><i id="r-loss-bar"></i></div></dd>
+      <dt>Kill switch</dt><dd id="r-kill">—</dd>
+    </dl>
+  </section>
+
+  <section class="card" id="card-controls">
+    <h2>Controls</h2>
+    <div class="controls">
+      <label for="profile-select">Profile</label>
+      <select id="profile-select" {% if read_only %}disabled{% endif %}>
+        {% for name in profiles %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+      </select>
+      <div class="btn-row">
+        <button class="primary" data-action="start" {% if read_only %}disabled{% endif %}>Start</button>
+        <button class="ghost" data-action="stop" {% if read_only %}disabled{% endif %}>Stop</button>
+        <button class="danger" data-action="kill">Kill switch</button>
+        <button class="ghost" data-action="release" {% if read_only %}disabled{% endif %}>Release</button>
+      </div>
+      <p class="muted small" id="control-status" role="status"></p>
+    </div>
+  </section>
+
+  <section class="card wide" id="card-trades">
+    <h2>Recent trades</h2>
+    <table class="trades">
+      <thead>
+        <tr><th>Closed</th><th>Slot</th><th>Side</th><th>Entry</th><th>Exit</th><th>PnL</th><th>Reason</th></tr>
+      </thead>
+      <tbody id="trades-body"><tr><td colspan="7" class="muted">No trades yet.</td></tr></tbody>
+    </table>
+    <p class="muted small" id="trades-summary"></p>
+  </section>
+</main>
+
+<footer class="footer">
+  <span class="muted small" id="last-error"></span>
+  <span class="muted small">Paper mode places no orders. Live mode is disabled in this build unless the operator enables it.</span>
+</footer>
+
+<script src="/static/app.js" defer></script>
+{% endblock %}

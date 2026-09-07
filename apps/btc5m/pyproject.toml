@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "btc5m"
+version = "2.0.0"
+description = "BTC 5-minute Up/Down trading toolkit for Polymarket: terminal and hardened web front-ends"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "httpx>=0.27",
+    "PyYAML>=6.0",
+    "rich>=13.7",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "Jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "itsdangerous>=2.2",
+    "argon2-cffi>=23.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+btc5m = "btc5m.cli:main"
+
+[tool.setuptools]
+packages = ["btc5m", "btc5m.sources", "btc5m.executors", "web"]
+
+[tool.setuptools.package-data]
+web = ["templates/*.html", "static/*"]

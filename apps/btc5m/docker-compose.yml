@@ -1,0 +1,51 @@
+# Two services from one image:
+#   web  — the hardened console (default)
+#   tui  — the terminal dashboard, run on demand
+#
+#   cp .env.example .env && edit, then:
+#     docker compose up -d web
+#     docker compose run --rm tui
+services:
+  web:
+    build: .
+    image: btc5m:2.0.0
+    env_file: [.env]
+    ports:
+      # Bound to loopback: put a TLS-terminating reverse proxy in front rather
+      # than exposing the console directly.
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - btc5m-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3).status==200 else 1)"]
+      interval: 30s
+      timeout: 4s
+      retries: 3
+      start_period: 10s
+
+  tui:
+    build: .
+    image: btc5m:2.0.0
+    env_file: [.env]
+    command: ["python", "-m", "btc5m.cli", "tui", "--profile", "demo", "--source", "simulated"]
+    volumes:
+      - btc5m-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    stdin_open: true
+    tty: true
+    profiles: [tools]
+
+volumes:
+  btc5m-data:
