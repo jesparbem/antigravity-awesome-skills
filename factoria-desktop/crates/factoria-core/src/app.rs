@@ -49,6 +49,8 @@ pub enum ModelState {
     NotInstalled,
     Installing,
     Installed,
+    /// Descargado y lanzándose: el motor todavía está cargando los pesos.
+    Starting,
     Running,
 }
 
@@ -94,6 +96,8 @@ pub struct AppCore {
     settings: Mutex<Settings>,
     /// Instalaciones en curso, para que la tarjeta muestre "Instalando".
     installing: Mutex<HashMap<String, ()>>,
+    /// Arranques en curso, para que la tarjeta muestre "Preparando".
+    starting: Mutex<HashMap<String, ()>>,
     /// Señal de parada de la generación activa.
     cancel: Mutex<Option<CancelToken>>,
 }
@@ -135,6 +139,7 @@ impl AppCore {
             chats: ChatStore::new(paths.clone()),
             settings: Mutex::new(settings),
             installing: Mutex::new(HashMap::new()),
+            starting: Mutex::new(HashMap::new()),
             cancel: Mutex::new(None),
             paths,
             policy,
@@ -202,6 +207,7 @@ impl AppCore {
         let installed = self.installed_index().await;
         let running = self.running().await;
         let installing = self.installing.lock().await.clone();
+        let starting = self.starting.lock().await.clone();
 
         let classified = fit::classify_all(&self.catalog.models, &self.hardware, &available);
         let recommended_id =
@@ -216,6 +222,8 @@ impl AppCore {
                     ModelState::Running
                 } else if installing.contains_key(&id) {
                     ModelState::Installing
+                } else if starting.contains_key(&id) {
+                    ModelState::Starting
                 } else if entry.is_some() {
                     ModelState::Installed
                 } else {
@@ -381,7 +389,20 @@ impl AppCore {
             .ok_or_else(|| RuntimeError::Unavailable(spec.runtimes.join(", ")))?;
         let tuning = Tuning::derive(&spec, &self.hardware);
         let started = std::time::Instant::now();
-        let running = runtime.start(&spec, &tuning).await?;
+        self.starting.lock().await.insert(model_id.to_string(), ());
+        let outcome = runtime.start(&spec, &tuning).await;
+        self.starting.lock().await.remove(model_id);
+        let running = match outcome {
+            Ok(running) => running,
+            Err(err) => {
+                self.audit.record(
+                    AuditEntry::new("model.start", "error")
+                        .model(model_id)
+                        .runtime(runtime.id()),
+                );
+                return Err(err.into());
+            }
+        };
 
         let mut settings = self.settings.lock().await;
         settings.active_model_id = Some(model_id.to_string());
@@ -506,7 +527,11 @@ impl AppCore {
         let message_id = answer.id.clone();
         let collected = Arc::new(std::sync::Mutex::new(String::new()));
         let sink_buffer = collected.clone();
-        let mut timer = GenerationTimer::start();
+        // El cronómetro se marca **dentro** del sumidero, con cada delta que
+        // llega. Medirlo al final daría un tiempo hasta el primer token igual
+        // al total y una velocidad sin sentido.
+        let timer = Arc::new(std::sync::Mutex::new(GenerationTimer::start()));
+        let sink_timer = timer.clone();
         let cancel_for_sink = cancel.clone();
 
         let outcome = runtime
@@ -514,6 +539,9 @@ impl AppCore {
                 request,
                 Box::new(move |delta| {
                     if let Delta::Text(text) = delta {
+                        if let Ok(mut t) = sink_timer.lock() {
+                            t.token();
+                        }
                         if let Ok(mut buf) = sink_buffer.lock() {
                             buf.push_str(&text);
                         }
@@ -532,11 +560,11 @@ impl AppCore {
         *self.cancel.lock().await = None;
 
         let text = collected.lock().map(|b| b.clone()).unwrap_or_default();
-        // Cada delta de texto es un token del motor.
-        for _ in 0..text.split_whitespace().count().max(1) {
-            timer.token();
-        }
-        let metrics = timer.finish();
+        let metrics = Arc::try_unwrap(timer)
+            .ok()
+            .and_then(|m| m.into_inner().ok())
+            .map(GenerationTimer::finish)
+            .unwrap_or_else(|| GenerationTimer::start().finish());
 
         match outcome {
             Ok(result) => {

@@ -137,6 +137,13 @@ struct Child {
     model_id: String,
     process: tokio::process::Child,
     running: RunningModel,
+    /// `false` mientras el motor carga los pesos.
+    ///
+    /// El proceso se guarda desde que se lanza, para poder matarlo si el
+    /// arranque falla, pero **no se publica como "en ejecución"** hasta que
+    /// `/health` responde. Publicarlo antes haría que la interfaz ofreciera
+    /// chatear con un motor que todavía rechaza conexiones.
+    ready: bool,
 }
 
 pub struct LlamaCppRuntime {
@@ -419,6 +426,7 @@ impl LlmRuntime for LlamaCppRuntime {
                 model_id: spec.id.clone(),
                 process,
                 running: running.clone(),
+                ready: false,
             });
         }
 
@@ -439,6 +447,12 @@ impl LlmRuntime for LlamaCppRuntime {
             return Err(err);
         }
 
+        {
+            let mut guard = self.child.lock().await;
+            if let Some(child) = guard.as_mut() {
+                child.ready = true;
+            }
+        }
         self.bus.emit(AppEvent::ModelStateChanged {
             model_id: spec.id.clone(),
             state: "running".into(),
@@ -464,7 +478,12 @@ impl LlmRuntime for LlamaCppRuntime {
     }
 
     async fn running(&self) -> Option<RunningModel> {
-        self.child.lock().await.as_ref().map(|c| c.running.clone())
+        self.child
+            .lock()
+            .await
+            .as_ref()
+            .filter(|c| c.ready)
+            .map(|c| c.running.clone())
     }
 
     async fn chat_stream(
@@ -495,7 +514,7 @@ impl LlmRuntime for LlamaCppRuntime {
             .json(&body)
             .send()
             .await
-            .map_err(|e| RuntimeError::Engine(e.to_string()))?;
+            .map_err(|e| RuntimeError::Engine(describe_request_error(&e)))?;
         if !response.status().is_success() {
             return Err(RuntimeError::Engine(format!(
                 "el motor respondió {}",
@@ -596,6 +615,22 @@ pub fn extract_archive(
         }
     }
     Ok(())
+}
+
+/// Mensaje de error con la causa real.
+///
+/// `reqwest` resume los fallos de transporte en "error sending request", que no
+/// dice si el motor se cayó, si rechazó la conexión o si cerró a mitad. Para
+/// diagnosticar un arranque fallido en el PC de un empleado hace falta la
+/// cadena completa.
+fn describe_request_error(err: &reqwest::Error) -> String {
+    let mut parts = vec![err.to_string()];
+    let mut source = std::error::Error::source(err);
+    while let Some(cause) = source {
+        parts.push(cause.to_string());
+        source = cause.source();
+    }
+    parts.join(": ")
 }
 
 fn safe_join(root: &std::path::Path, relative: &std::path::Path) -> Option<PathBuf> {

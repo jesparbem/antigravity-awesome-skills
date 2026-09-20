@@ -71,6 +71,8 @@
         {/if}
         {#if card.state === "running"}
           <span class="chip chip-running" data-testid="chip-running">● En ejecución</span>
+        {:else if card.state === "starting"}
+          <span class="chip chip-compatible latido">Preparando…</span>
         {/if}
       </div>
       <p class="mt-0.5 text-[13px]" style="color:var(--texto-suave)">
@@ -181,6 +183,10 @@
       </button>
     {:else if card.state === "installing"}
       <button class="btn btn-primary btn-sm" disabled>Instalando…</button>
+    {:else if card.state === "starting"}
+      <button class="btn btn-accent btn-sm latido" disabled data-testid="btn-starting">
+        Preparando el motor…
+      </button>
     {:else if card.state === "installed"}
       <button class="btn btn-accent btn-sm" onclick={start} disabled={busy} data-testid="btn-start">
         <Icon name="play" size={15} /> Ejecutar

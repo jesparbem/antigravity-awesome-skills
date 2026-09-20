@@ -102,6 +102,9 @@
       pendingId = null;
       messages = await api.messages(thread.id);
       store.threads = await api.threads();
+      // El primer mensaje del usuario da nombre a la conversación: la cabecera
+      // debe reflejarlo sin recargar.
+      activeThread = store.threads.find((t) => t.id === thread.id) ?? activeThread;
     } catch (err) {
       clearInterval(watcher);
       pendingId = null;

@@ -64,6 +64,7 @@ export const STATE_LABELS: Record<string, string> = {
   notInstalled: "No instalado",
   installing: "Instalando",
   installed: "Instalado",
+  starting: "Preparando",
   running: "En ejecución",
 };
 

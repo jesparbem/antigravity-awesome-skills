@@ -1,7 +1,7 @@
 /** Tipos espejo de las estructuras de `factoria-core`. */
 
 export type FitLevel = "optimal" | "compatible" | "notRecommended";
-export type ModelState = "notInstalled" | "installing" | "installed" | "running";
+export type ModelState = "notInstalled" | "installing" | "installed" | "starting" | "running";
 export type GpuKind = "discrete" | "integrated" | "unified";
 export type Accelerator = "metal" | "cuda" | "vulkan" | "openCl" | "cpu";
 

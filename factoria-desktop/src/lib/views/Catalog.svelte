@@ -83,6 +83,7 @@
       <option value="all">Cualquier estado</option>
       <option value="notInstalled">No instalados</option>
       <option value="installed">Instalados</option>
+      <option value="starting">Preparando</option>
       <option value="running">En ejecución</option>
     </select>
   </div>

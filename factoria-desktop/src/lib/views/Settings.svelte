@@ -128,7 +128,7 @@
   </section>
 
   <!-- Política -->
-  <section class="card p-5" data-testid="settings-policy">
+  <section class="card p-5" data-testid="settings-policy" data-loaded={policy ? "true" : "false"}>
     <h2 class="mb-3 flex items-center gap-2 text-base font-bold">
       Configuración corporativa
       {#if policy?.managed}
