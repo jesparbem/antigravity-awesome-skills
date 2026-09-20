@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/factoria-core"]
+members = ["crates/factoria-core", "crates/factoria-server"]
 
 [workspace.package]
 version = "0.1.0"
@@ -18,7 +18,7 @@ async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "fs", "sync", "time", "io-util", "signal"] }
-tokio-stream = "0.1"
+tokio-stream = { version = "0.1", features = ["sync"] }
 futures-util = "0.3"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "charset", "gzip"] }
 sysinfo = "0.33"
