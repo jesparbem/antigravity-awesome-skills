@@ -1,0 +1,12 @@
+node_modules/
+dist/
+target/
+.svelte-kit/
+test-results/
+playwright-report/
+screenshots/
+src-tauri/gen/
+src-tauri/target/
+*.local
+.env
+.env.*
