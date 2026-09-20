@@ -24,7 +24,6 @@ pub enum UpdateChannel {
     Auto,
 }
 
-
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
 pub struct NetworkPolicy {
@@ -59,7 +58,6 @@ pub struct TelemetryPolicy {
     pub enabled: bool,
     pub endpoint: Option<String>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]

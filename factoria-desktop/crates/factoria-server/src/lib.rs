@@ -108,14 +108,21 @@ mod tests {
     #[tokio::test]
     async fn it_listens_only_on_loopback() {
         let (_t, server, _c) = server().await;
-        assert!(server.addr.ip().is_loopback(), "no puede escuchar fuera del equipo");
+        assert!(
+            server.addr.ip().is_loopback(),
+            "no puede escuchar fuera del equipo"
+        );
         assert_ne!(server.addr.port(), 0);
     }
 
     #[tokio::test]
     async fn health_needs_no_token_so_the_ui_can_probe_it() {
         let (_t, server, client) = server().await;
-        let res = client.get(format!("{}/api/health", server.url())).send().await.unwrap();
+        let res = client
+            .get(format!("{}/api/health", server.url()))
+            .send()
+            .await
+            .unwrap();
         assert!(res.status().is_success());
         let body: serde_json::Value = res.json().await.unwrap();
         assert_eq!(body["status"], "ok");
@@ -125,7 +132,13 @@ mod tests {
     #[tokio::test]
     async fn every_data_endpoint_refuses_a_request_without_the_token() {
         let (_t, server, client) = server().await;
-        for path in ["/api/home", "/api/models", "/api/threads", "/api/settings", "/api/policy"] {
+        for path in [
+            "/api/home",
+            "/api/models",
+            "/api/threads",
+            "/api/settings",
+            "/api/policy",
+        ] {
             let res = client
                 .get(format!("{}{path}", server.url()))
                 .send()
@@ -262,7 +275,11 @@ mod tests {
     async fn the_event_stream_accepts_the_token_in_the_query() {
         let (_t, server, client) = server().await;
         let res = client
-            .get(format!("{}/api/events?token={}", server.url(), server.token))
+            .get(format!(
+                "{}/api/events?token={}",
+                server.url(),
+                server.token
+            ))
             .send()
             .await
             .unwrap();
@@ -290,7 +307,11 @@ mod tests {
     #[tokio::test]
     async fn responses_carry_a_strict_content_security_policy() {
         let (_t, server, client) = server().await;
-        let res = client.get(format!("{}/api/health", server.url())).send().await.unwrap();
+        let res = client
+            .get(format!("{}/api/health", server.url()))
+            .send()
+            .await
+            .unwrap();
         let csp = res
             .headers()
             .get("content-security-policy")
@@ -300,7 +321,10 @@ mod tests {
             .to_string();
         assert!(csp.contains("default-src 'self'"));
         assert!(!csp.contains("unsafe-eval"), "la interfaz no necesita eval");
-        assert_eq!(res.headers().get("x-content-type-options").unwrap(), "nosniff");
+        assert_eq!(
+            res.headers().get("x-content-type-options").unwrap(),
+            "nosniff"
+        );
     }
 
     #[tokio::test]

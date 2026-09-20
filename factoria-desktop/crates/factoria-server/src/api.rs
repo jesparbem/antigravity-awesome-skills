@@ -236,7 +236,10 @@ async fn send(
 ) -> ApiResult<factoria_core::chat::Message> {
     authorize(&state, &headers, None)?;
     Ok(Json(
-        state.core.send_message(&id, &body.text, body.regenerate).await?,
+        state
+            .core
+            .send_message(&id, &body.text, body.regenerate)
+            .await?,
     ))
 }
 
