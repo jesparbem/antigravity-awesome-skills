@@ -5,6 +5,10 @@ si no se puede ejecutar en este entorno, se indica por qué.
 
 Estado: ✅ hecho · ⚠️ hecho con limitación documentada · ⛔ fuera del MVP
 
+> Resultado: **248 comprobaciones automatizadas en verde** (192 tests de Rust,
+> 26 de TypeScript, 30 de extremo a extremo en navegador). El detalle de qué se
+> verificó y qué no está en [`VALIDATION.md`](VALIDATION.md).
+
 ---
 
 ## T0 · Andamiaje
@@ -40,6 +44,7 @@ Estado: ✅ hecho · ⚠️ hecho con limitación documentada · ⛔ fuera del M
 |---|-------|--------------|--------|
 | T3.1 | `trait LlmRuntime` + `RuntimeRegistry` | Compila; test con runtime falso | ✅ |
 | T3.2 | Adaptador **llama.cpp**: *pins*, extracción, arranque, `/health`, parada | E2E contra un `llama-server` de prueba que habla el mismo protocolo | ⚠️ ver L1 |
+| T3.8 | El modelo no se publica como "en ejecución" hasta que `/health` responde | E2E: enviar justo tras arrancar no falla | ✅ |
 | T3.3 | *Flags* derivados del hardware (`-ngl`, `-c`, `-t`, `--cache-type-*`, `-fa`) | `cargo test tuning::` | ✅ |
 | T3.4 | *Streaming* SSE compatible OpenAI + cancelación | Test de parseo + E2E con parada real | ✅ |
 | T3.5 | Adaptador **Ollama** (probe, list, pull, chat) | Test de parseo de `/api/tags` y `/api/chat`; *probe* real si hay demonio | ⚠️ ver L2 |
@@ -71,7 +76,7 @@ Estado: ✅ hecho · ⚠️ hecho con limitación documentada · ⛔ fuera del M
 |---|-------|--------------|--------|
 | T6.1 | `factoria-server` con `/api/*` + `/api/events` (SSE) + estáticos | `curl` a cada endpoint | ✅ |
 | T6.2 | Token de sesión y comprobación de `Origin` | Test: petición sin token ⇒ 401 | ✅ |
-| T6.3 | `src-tauri` con los mismos comandos | `cargo check -p factoria-desktop` | ⚠️ ver L4 |
+| T6.3 | `src-tauri` con los mismos comandos | `cargo check -p factoria-desktop` + `clippy -D warnings` | ✅ compila; el *bundle* sigue sin generarse (L4) |
 
 ## T7 · Frontend
 
@@ -110,5 +115,5 @@ SSO · catálogo centralizado remoto · multiidioma · firma y notarización de 
 | **L1** | La política de egreso de este contenedor **bloquea `huggingface.co`, `ollama.com` y `api.github.com`** (403 del proxy). | No se puede descargar aquí ni un binario real de `llama-server` ni pesos GGUF reales. El E2E usa un **`llama-server` de prueba** que implementa el mismo protocolo (`/health`, `/v1/chat/completions` con SSE) y un *mirror* HTTP local. Se ejercita **el código real** de FactorIA (arranque de proceso, sondeo de salud, descarga, SHA-256, parseo SSE, cancelación); lo único sustituido es llama.cpp y los pesos. |
 | **L2** | No hay demonio Ollama en este contenedor. | El adaptador Ollama se valida con tests de parseo y un servidor de prueba, no contra Ollama real. |
 | **L3** | Sin acceso a Hugging Face. | Las URLs y SHA-256 del catálogo embebido **no se han podido verificar en vivo**; están marcadas en el código y deben confirmarse antes de distribuir. |
-| **L4** | Linux no es plataforma soportada por el *bundle*; compilar `src-tauri` requiere WebKitGTK. | Se verifica lo que el entorno permite y se indica explícitamente el resultado en `docs/VALIDATION.md`. |
+| **L4** | Linux no es plataforma soportada por el *bundle*. | Instaladas las dependencias GTK/WebKit, el *crate* del shell **compila y pasa clippy**; lo que no se ha generado son los instaladores `.dmg`/NSIS, que exigen macOS y Windows. |
 | **L5** | Sin GPU en el contenedor. | Las rutas CUDA/Metal/Vulkan se validan con tests de los *parsers* y de la lógica de clasificación, no con hardware real. |

@@ -4,7 +4,8 @@ target/
 .svelte-kit/
 test-results/
 playwright-report/
-screenshots/
+# Capturas regeneradas por `npm run test:e2e`. Las versionadas viven en docs/screenshots/.
+/screenshots/
 src-tauri/gen/
 src-tauri/target/
 *.local
