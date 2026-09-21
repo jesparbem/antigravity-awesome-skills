@@ -1,0 +1,13 @@
+node_modules/
+dist/
+target/
+.svelte-kit/
+test-results/
+playwright-report/
+# Capturas regeneradas por `npm run test:e2e`. Las versionadas viven en docs/screenshots/.
+/screenshots/
+src-tauri/gen/
+src-tauri/target/
+*.local
+.env
+.env.*

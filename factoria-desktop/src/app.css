@@ -1,0 +1,319 @@
+@import "tailwindcss";
+
+/*
+ * Identidad visual FactorIA Desktop.
+ *
+ * Tokens tomados de la identidad corporativa de Naturgy: azul #004165 como
+ * color principal, naranja #E57200 como acento. La tipografía oficial
+ * (FS Emeric) es propietaria y no se distribuye con el código: la aplicación
+ * usa la pila del sistema, que además garantiza que la interfaz se dibuje
+ * igual sin internet y detrás de un proxy corporativo. Si el equipo de marca
+ * coloca las fuentes en `src/assets/fonts/`, basta con declararlas aquí.
+ */
+
+@theme {
+  --color-azul: #004165;
+  --color-azul-oscuro: #004571;
+  --color-azul-profundo: #002c45;
+  --color-azul-pale: #d6eaf5;
+  --color-naranja: #e57200;
+  --color-naranja-claro: #fbae40;
+  --color-naranja-pale: #fff3e0;
+
+  --color-gris-900: #16202a;
+  --color-gris-800: #2c353d;
+  --color-gris-600: #5a6670;
+  --color-gris-400: #9ba5ae;
+  --color-gris-200: #d8dde2;
+  --color-gris-100: #eef1f3;
+  --color-gris-50: #f8fafb;
+
+  --color-verde: #0f8a5f;
+  --color-ambar: #b26a00;
+  --color-rojo: #c8102e;
+
+  --font-display:
+    "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-body:
+    "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    Arial, sans-serif;
+
+  --radius-card: 14px;
+}
+
+:root {
+  color-scheme: light;
+  --superficie: #ffffff;
+  --fondo: var(--color-gris-50);
+  --texto: var(--color-gris-900);
+  --texto-suave: var(--color-gris-600);
+  --borde: var(--color-gris-200);
+  --sombra-card: 0 1px 2px rgb(0 65 101 / 0.06), 0 8px 24px rgb(0 65 101 / 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --superficie: #11202b;
+    --fondo: #0b1720;
+    --texto: #eef4f8;
+    --texto-suave: #9fb2c0;
+    --borde: #1e3444;
+    --sombra-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.28);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --superficie: #11202b;
+  --fondo: #0b1720;
+  --texto: #eef4f8;
+  --texto-suave: #9fb2c0;
+  --borde: #1e3444;
+  --sombra-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+/* --- Componentes reutilizables ------------------------------------------ */
+
+.card {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radius-card);
+  box-shadow: var(--sombra-card);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease,
+    opacity 0.15s ease;
+  white-space: nowrap;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--color-naranja);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--color-azul);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-azul-oscuro);
+}
+
+.btn-accent {
+  background: var(--color-naranja);
+  color: #fff;
+}
+.btn-accent:hover:not(:disabled) {
+  background: #cc6600;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--texto);
+  border-color: var(--borde);
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--color-azul);
+  background: color-mix(in srgb, var(--color-azul) 6%, transparent);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--color-rojo);
+  border-color: var(--borde);
+}
+.btn-danger:hover:not(:disabled) {
+  border-color: var(--color-rojo);
+  background: color-mix(in srgb, var(--color-rojo) 8%, transparent);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.etiqueta {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--borde);
+  color: var(--texto-suave);
+  background: color-mix(in srgb, var(--color-gris-100) 60%, transparent);
+}
+
+.chip-optimal {
+  color: var(--color-verde);
+  border-color: color-mix(in srgb, var(--color-verde) 40%, transparent);
+  background: color-mix(in srgb, var(--color-verde) 10%, transparent);
+}
+.chip-compatible {
+  color: var(--color-ambar);
+  border-color: color-mix(in srgb, var(--color-ambar) 40%, transparent);
+  background: color-mix(in srgb, var(--color-ambar) 10%, transparent);
+}
+.chip-notRecommended {
+  color: var(--color-gris-600);
+  border-color: var(--borde);
+}
+.chip-running {
+  color: var(--color-verde);
+  border-color: color-mix(in srgb, var(--color-verde) 45%, transparent);
+  background: color-mix(in srgb, var(--color-verde) 12%, transparent);
+}
+
+.barra {
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-gris-400) 28%, transparent);
+  overflow: hidden;
+}
+.barra > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-azul);
+  transition: width 0.4s ease;
+}
+.barra.acento > span {
+  background: var(--color-naranja);
+}
+
+.campo {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+}
+.campo:focus {
+  outline: none;
+  border-color: var(--color-azul);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-azul) 16%, transparent);
+}
+
+.md :is(p, ul, ol, pre) {
+  margin: 0 0 0.75em;
+}
+/* Tailwind quita los marcadores de lista en su preflight; el markdown de una
+   respuesta los necesita para leerse como una lista. */
+.md ul {
+  padding-left: 1.3em;
+  list-style: disc;
+}
+.md ol {
+  padding-left: 1.3em;
+  list-style: decimal;
+}
+.md li {
+  margin-bottom: 0.2em;
+}
+.md code {
+  background: color-mix(in srgb, var(--color-gris-400) 20%, transparent);
+  padding: 1px 5px;
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+.md pre {
+  background: var(--color-gris-900);
+  color: #e6edf3;
+  padding: 12px 14px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+.md pre code {
+  background: none;
+  padding: 0;
+}
+.md > *:last-child {
+  margin-bottom: 0;
+}
+
+@keyframes latir {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.latido {
+  animation: latir 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
