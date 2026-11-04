@@ -11670,6 +11670,116 @@
     "date_added": "2026-02-27"
   },
   {
+    "id": "trader-alerts",
+    "path": "skills/trader-alerts",
+    "category": "uncategorized",
+    "name": "trader-alerts",
+    "description": "Price alerts for targets, stops, percent moves and the NYSE opening bell, each ringing once. Knows NYSE hours and holidays, fetches free delayed quotes and writes trader/prices.json. Use for \"alert me when\", \"set a stop\", \"is the market open\" or to refresh prices.",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-analyst",
+    "path": "skills/trader-analyst",
+    "category": "uncategorized",
+    "name": "trader-analyst",
+    "description": "Earnings analyst that reads a company's reported numbers from SEC XBRL (10-Q/10-K, earnings 8-K): revenue, margins, net income, diluted EPS, YoY and TTM. Writes a metrics file for the screener. Use for \"how did Apple's earnings look\" or \"compare margins\".",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-broker",
+    "path": "skills/trader-broker",
+    "category": "uncategorized",
+    "name": "trader-broker",
+    "description": "Order executor: turns risk-passed orders into exact tickets for your brokerage connector (Alpaca paper by default, IBKR) and records your explicit yes. Never places anything itself. Use for \"place the orders\", \"connect Alpaca\", or after /trader-risk passes.",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-budget",
+    "path": "skills/trader-budget",
+    "category": "uncategorized",
+    "name": "trader-budget",
+    "description": "Budget manager that sizes every position to your budget with a cash buffer, a per-stock cap and minimum order size, and writes proposed buys to trader/orders.json. Nothing is placed. Use for \"I have $5,000\", \"size my trades\", or after /trader-copycat.",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-copycat",
+    "path": "skills/trader-copycat",
+    "category": "uncategorized",
+    "name": "trader-copycat",
+    "description": "Reverse-engineers a famous investor's portfolio from their SEC 13F-HR: weights, CUSIP-to-ticker, and what they bought, added, trimmed or sold since last quarter. Writes trader/targets.json. Use for \"copy Buffett\", \"what does Ackman own\" or \"show me their 13F\".",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-news",
+    "path": "skills/trader-news",
+    "category": "uncategorized",
+    "name": "trader-news",
+    "description": "News monitor for the stocks you hold: Yahoo Finance headlines and SEC 8-K filings, only what is new since the last check, flagged by why it matters. Use for \"any news on my stocks\", \"monitor the news\", \"check the 8-Ks\" or \"morning briefing\".",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-pelosi",
+    "path": "skills/trader-pelosi",
+    "category": "uncategorized",
+    "name": "trader-pelosi",
+    "description": "Tracks stock trades members of Congress disclose under the STOCK Act: reads House Clerk PTRs as they post, alerts once per filing and parses each PDF into clean rows. Flags trades in stocks you hold. Use for \"what is Pelosi buying\" or \"Congress trades\".",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-rebalance",
+    "path": "skills/trader-rebalance",
+    "category": "uncategorized",
+    "name": "trader-rebalance",
+    "description": "Rebalancer that values holdings, measures drift from target weights and proposes trades only for stocks outside a band (default 5 points), keeping cash buffer and caps. Writes trader/orders.json as proposals. Use for \"rebalance\" or \"my portfolio drifted\".",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-risk",
+    "path": "skills/trader-risk",
+    "category": "uncategorized",
+    "name": "trader-risk",
+    "description": "Risk manager that checks every proposed order against your limits (blocked tickers, sizes, position percent, cash buffer, no margin/shorts/options unless allowed, daily limit) and prints PASS or BLOCK with the reason. Run before /trader-broker, always.",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-screener",
+    "path": "skills/trader-screener",
+    "category": "uncategorized",
+    "name": "trader-screener",
+    "description": "Stock screener that checks companies against your own rules (growth, margins, EPS, P/E, sector, any metric), says which rule each passes or fails and by how much, and ranks a shortlist. Use for \"screen for stocks\" or \"filter my watchlist\".",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
+    "id": "trader-tax",
+    "path": "skills/trader-tax",
+    "category": "uncategorized",
+    "name": "trader-tax",
+    "description": "Tax optimizer that tracks cost-basis lots, unrealized short/long-term gains, what a sale would realize, tax-loss harvesting candidates and wash sales; writes harvest sells as proposals only. Not tax advice. Use for \"cost basis\", \"tax-loss harvest\" or \"wash sale\".",
+    "risk": "unknown",
+    "source": "Jakeschincariol/trader-skill (MIT)",
+    "date_added": "2026-11-04"
+  },
+  {
     "id": "travel-health-analyzer",
     "path": "skills/travel-health-analyzer",
     "category": "uncategorized",
