@@ -1,0 +1,4 @@
+yt-dlp>=2025.1.1
+youtube-transcript-api>=1.0.0
+# Optional: transcribe Instagram Reels / videos without captions
+# faster-whisper>=1.0.0
